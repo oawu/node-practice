@@ -5,9 +5,8 @@
  * @link        https://www.ioa.tw/
  */
 
-module.exports = ({ request, response }) => {
-  // db
-  response.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'})
-  response.write('Hi, Hello World!')
+module.exports = ({ request, response, message }) => {
+  response.writeHead(404, {'Content-Type': 'text/html; charset=UTF-8'})
+  response.write('not found ' + message)
   response.end()
 }

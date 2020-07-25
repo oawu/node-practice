@@ -1,5 +1,11 @@
 const port = 8032
 
+const Path = require('path')
+const rootPath = Path.resolve(__dirname, ('..' + Path.sep).repeat(0)) + Path.sep
+const apiPath = rootPath + 'api' + Path.sep
+
+const FileSystem = require('fs')
+
 const http = require('http').Server()
 http.on('error', error => console.error('錯誤', error))
 http.listen(port, _ => {
@@ -14,44 +20,22 @@ http.on('request', (request, response) => {
 
   // 比對 Router
   Router.mapping({ method, pathname, request, response })
-
 })
 
 const Router = {
   mapping ({ method, pathname, request, response }) {
+    pathname = pathname === '' ? 'index' : pathname
 
-console.error(pathname);
+    const dirs = pathname.split('/')
+    const file = dirs.pop()
+    const api = apiPath + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + method + '-' + file + '.js'
 
-
-
-    response.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'})
-    response.write('Hi, Hello World!')
-    response.end()
-    // pathname = pathname === '' ? 'index' : pathname
-
-  //   const dirs = pathname.split('/')
-  //   const file = dirs.pop()
-
-  //   params.gets = getGET(params.gets)
-
-  //   try { params.json = JSON.parse(params.raw) }
-  //   catch (e) { params.json = null }
-
-  //   const api = Path.api + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + method + '-' + file + '.js'
-  //   const notFound = Path.api + this.notFound + '.js'
-
-  //   return FileSystem.promises.access(api, FileSystem.constants.R_OK)
-  //     .then(_ => {
-  //       if (Config.val.env != 'Production')
-  //         delete require.cache[api]
-  //       require(api)(request, response, params, pathname)
-  //     })
-  //     .catch(e => FileSystem.promises.access(notFound, FileSystem.constants.R_OK)
-  //       .then(_ => {
-  //         if (Config.val.env != 'Production')
-  //           delete require.cache[notFound]
-  //         require(notFound)(request, response, params, pathname, e.message)
-  //       })
-  //       .catch(_ => this.error(request, response, params, pathname, e.message)))
-  // }
+    FileSystem.promises.access(api, FileSystem.constants.R_OK)
+      .then(_ => {
+        delete require.cache[api]
+        require(api)({ request, response })
+      })
+      .catch(e => require(apiPath + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + '404.js')({ request, response, message: e.message }))
+  }
 }
+
