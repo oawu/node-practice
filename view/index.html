@@ -78,7 +78,9 @@
               this.socket.on('online', online => this.online = online)
               this.socket.on('getItems', items => this.items = items)
               this.socket.on('deleteItem', id => {
-                this.$set(this.items, this.items.map(item => item && item.id).indexOf(id), null);
+                // this.$set(this.items, this.items.map(item => item && item.id).indexOf(id), null);
+
+                this.items.splice(this.items.map(item => item && item.id).indexOf(id), 1)
               })
             })
           },
@@ -98,7 +100,7 @@
 
 
       <div id='list'>
-        <div class='item' v-for="item in items"  :key='item.id' v-if='item'>
+        <div class='item' v-for="item in items"  :key='item.id'>
           <span>{{ item.title }}</span>
           <label @click='deleteItem(item.id)'>delete</label>
         </div>
