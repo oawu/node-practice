@@ -7,6 +7,8 @@
 
     <title>Ginkgo！</title>
 
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
     <script type="text/javascript">
 
       /** jQuery v1.12.4 | (c) jQuery Foundation | jquery.org/license */
@@ -27,10 +29,27 @@
         new Vue({
           el: '#app',
           data: {
-            a: 1
+            online: 0
           },
           mounted () {
-            console.error(11111);
+            // console.error(11111);
+            const socket = io.connect('http://127.0.0.1:8032/', {
+              reconnection: false
+            })
+            
+            socket.on('connect_error', _ => {
+              console.error('first error')
+            })
+            socket.on('disconnect', _ => {
+              console.error('中間斷掉')
+            })
+            socket.on('connect', _ => {
+              // console.error(socket.id);
+              
+              socket.on('online', online => {
+                this.online = online
+              })
+            })
           }
         })
         
@@ -39,7 +58,7 @@
   </head>
   <body>
     <main id='app'>
-      {{ a }}
+      線上人數：{{ online }}
     </main>
   </body>
 </html>

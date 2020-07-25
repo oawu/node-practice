@@ -8,12 +8,29 @@ const FileSystem = require('fs')
 
 const http = require('http').Server()
 http.on('error', error => console.error('錯誤', error))
+
+// const sockets = []
+const sockets = new Map()
+
 http.listen(port, _ => {
   console.error('機器開好了，網址是：http://127.0.0.1:' + port + '/');
   
   SocketIO = require('socket.io').listen(http)
+  
   SocketIO.sockets.on('connection', socket => {
-    console.error(1111111111111);
+    sockets.set(socket, 'socket')
+    // sockets.push(socket)
+    // console.error('建立連線：' + socket.id);
+
+    socket.on('disconnect', _ => {
+      // console.error('斷掉連線：' + socket.id);
+      // sockets.indexOf(socket)
+      sockets.delete(socket.id)
+      SocketIO.sockets.emit('online', sockets.size)
+    })
+
+    SocketIO.sockets.emit('online', sockets.size)
+    // sockets.forEach(socket => socket.emit('online', sockets.length))
   })
 
 
@@ -43,8 +60,8 @@ const Router = {
         require(api)({ request, response })
       })
       .catch(e => {
-        console.error(e);
-        // require(apiPath + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + '404.js')({ request, response, message: e.message })
+        // console.error(e);
+        require(apiPath + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + '404.js')({ request, response, message: e.message })
       })
   }
 }

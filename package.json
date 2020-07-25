@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/comdan66/node-practice/issues"
   },
-  "homepage": "https://github.com/comdan66/node-practice#readme"
+  "homepage": "https://github.com/comdan66/node-practice#readme",
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  }
 }
