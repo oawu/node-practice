@@ -10,6 +10,13 @@ const http = require('http').Server()
 http.on('error', error => console.error('錯誤', error))
 http.listen(port, _ => {
   console.error('機器開好了，網址是：http://127.0.0.1:' + port + '/');
+  
+  SocketIO = require('socket.io').listen(http)
+  SocketIO.sockets.on('connection', socket => {
+    console.error(1111111111111);
+  })
+
+
 })
 http.on('request', (request, response) => {
   const URL = require('url')
