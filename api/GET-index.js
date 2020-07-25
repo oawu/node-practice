@@ -5,9 +5,21 @@
  * @link        https://www.ioa.tw/
  */
 
+const FileSystem = require('fs')
+const Path = require('path')
+const rootPath = Path.resolve(__dirname, ('..' + Path.sep).repeat(1)) + Path.sep
+const viewPath = rootPath + 'view' + Path.sep
+
 module.exports = ({ request, response }) => {
-  // db
-  response.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'})
-  response.write('Hi, Hello World!')
-  response.end()
+  FileSystem.readFile(viewPath + 'index.html', { encoding: 'utf8' }, (error, data) => {
+    if (error) {
+      response.writeHead(500, {'Content-Type': 'text/html; charset=UTF-8'})
+      response.write("Error：" + error.message)
+      response.end()
+    } else {
+      response.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'})
+      response.write(data)
+      response.end()
+    }
+  })
 }

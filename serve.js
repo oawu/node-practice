@@ -35,7 +35,10 @@ const Router = {
         delete require.cache[api]
         require(api)({ request, response })
       })
-      .catch(e => require(apiPath + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + '404.js')({ request, response, message: e.message }))
+      .catch(e => {
+        console.error(e);
+        // require(apiPath + (dirs.length ? dirs.join(Path.sep) + Path.sep : '') + '404.js')({ request, response, message: e.message })
+      })
   }
 }
 
