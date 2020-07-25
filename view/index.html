@@ -7,6 +7,36 @@
 
     <title>Ginkgo！</title>
 
+    <style type="text/css">
+      #list {
+        display: block;
+        width: 320px;
+        margin-top: 32px;
+        border: 1px dashed rgba(0, 0, 0, .3);
+      }
+      .item {
+        display: inline-block;
+        width: 100%;
+        height: 32px;
+        line-height: 32px;
+        display: flex;
+
+      }
+      .item span {
+        width: calc(100% - 80px);
+      }
+      .item label {
+        width: 80px;
+        text-align: center;
+        cursor: pointer;
+        border-left: 1px dashed rgba(0, 0, 0, .3);
+      }
+      .item + .item {
+        border-top: 1px dashed rgba(0, 0, 0, .3);
+      }
+
+
+    </style>
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 
     <script type="text/javascript">
@@ -29,27 +59,33 @@
         new Vue({
           el: '#app',
           data: {
-            online: 0
+            online: 0,
+            items: [],
+            socket: null
           },
           mounted () {
-            // console.error(11111);
-            const socket = io.connect('http://127.0.0.1:8032/', {
+            this.socket = io.connect('http://127.0.0.1:8032/', {
               reconnection: false
             })
             
-            socket.on('connect_error', _ => {
+            this.socket.on('connect_error', _ => {
               console.error('first error')
             })
-            socket.on('disconnect', _ => {
+            this.socket.on('disconnect', _ => {
               console.error('中間斷掉')
             })
-            socket.on('connect', _ => {
-              // console.error(socket.id);
-              
-              socket.on('online', online => {
-                this.online = online
+            this.socket.on('connect', _ => {
+              this.socket.on('online', online => this.online = online)
+              this.socket.on('getItems', items => this.items = items)
+              this.socket.on('deleteItem', id => {
+                this.$set(this.items, this.items.map(item => item && item.id).indexOf(id), null);
               })
             })
+          },
+          methods: {
+            deleteItem (id) {
+              this.socket.connected && this.socket.emit('deleteItem', id)
+            }
           }
         })
         
@@ -59,6 +95,14 @@
   <body>
     <main id='app'>
       線上人數：{{ online }}
+
+
+      <div id='list'>
+        <div class='item' v-for="item in items"  :key='item.id' v-if='item'>
+          <span>{{ item.title }}</span>
+          <label @click='deleteItem(item.id)'>delete</label>
+        </div>
+      </div>
     </main>
   </body>
 </html>

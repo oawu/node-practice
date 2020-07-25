@@ -11,6 +11,23 @@ http.on('error', error => console.error('錯誤', error))
 
 // const sockets = []
 const sockets = new Map()
+let items = [
+  { id: 2, title: 'oa 2' },
+  { id: 1, title: 'oa 1' },
+  { id: 3, title: 'oa 3' },
+  { id: 4, title: 'oa 4' },
+]
+// const items = new Map()
+// items.set(2, { id: 2, title: 'oa 2' })
+// items.set(1, { id: 1, title: 'oa 1' })
+// items.set(3, { id: 3, title: 'oa 3' })
+// items.set(4, { id: 4, title: 'oa 4' })
+
+// const tran = items => {
+//   const news = []
+//   items.forEach(item => news.push(item))
+//   return news
+// }
 
 http.listen(port, _ => {
   console.error('機器開好了，網址是：http://127.0.0.1:' + port + '/');
@@ -25,11 +42,21 @@ http.listen(port, _ => {
     socket.on('disconnect', _ => {
       // console.error('斷掉連線：' + socket.id);
       // sockets.indexOf(socket)
-      sockets.delete(socket.id)
+      sockets.delete(socket)
       SocketIO.sockets.emit('online', sockets.size)
     })
 
+    socket.on('deleteItem', id => {
+      items = items.filter(item => item.id != id)
+      // items.delete(id)
+      SocketIO.sockets.emit('deleteItem', id)
+    })
+
     SocketIO.sockets.emit('online', sockets.size)
+
+
+    socket.emit('getItems', items)
+
     // sockets.forEach(socket => socket.emit('online', sockets.length))
   })
 
